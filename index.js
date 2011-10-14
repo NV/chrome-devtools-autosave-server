@@ -3,9 +3,6 @@ var fs = require('fs');
 
 http.createServer(function(request, response) {
 
-    response.writeHead(200);
-    response.end('\n');
-
     var url = request.headers['x-url'];
 
     if (!url || url.indexOf('file://') != 0) {
@@ -20,7 +17,15 @@ http.createServer(function(request, response) {
     var path = decodeURIComponent(url.replace(/^file:\/\/(?:localhost)?/, ''));
     request.on('data', function(data) {
         console.log('Saved a ' + request.headers['x-type'] + ' to ' + path);
-        fs.writeFile(path, data);
+        fs.writeFile(path, data, function(error) {
+            if (error) {
+                response.writeHead(500);
+                response.end(error + '\n');
+            } else {
+                response.writeHead(200);
+                response.end('OK\n');
+            }
+        });
     });
 
 }).listen(9104, '127.0.0.1');
