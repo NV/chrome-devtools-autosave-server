@@ -15,17 +15,28 @@ http.createServer(function(request, response) {
     }
 
     var path = decodeURIComponent(url.replace(/^file:\/\/(?:localhost)?/, ''));
-    request.on('data', function(data) {
-        console.log('Saved a ' + request.headers['x-type'] + ' to ' + path);
-        fs.writeFile(path, data, function(error) {
-            if (error) {
-                response.writeHead(500);
-                response.end(error + '\n');
-            } else {
-                response.writeHead(200);
-                response.end('OK\n');
-            }
+
+    var chunks = [];
+    request.on('data', function(chunk) {
+        chunks.push(chunk);
+    });
+
+    request.on('end', function() {
+        var stream = fs.createWriteStream(path);
+        for (var i = 0; i < chunks.length; i++) {
+            stream.write(chunks[i]);
+        }
+        stream.on('error', function(error) {
+            console.error(error.message);
+            response.writeHead(500);
+            response.end(error.message);
         });
+        stream.on('close', function() {
+            response.writeHead(200);
+            response.end('OK\n');
+            console.log('Saved a ' + request.headers['x-type'] + ' to ' + path);
+        });
+        stream.end();
     });
 
 }).listen(9104, '127.0.0.1');
