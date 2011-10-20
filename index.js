@@ -3,14 +3,25 @@ var fs = require('fs');
 
 http.createServer(function(request, response) {
 
+    function internalServerError(message) {
+        response.writeHead(500);
+        response.end(message);
+    }
+
     var url = request.headers['x-url'];
 
-    if (!url || url.indexOf('file://') != 0) {
+    if (!url) {
+        internalServerError('X-URL header is missing');
+        return;
+    }
+
+    if (url.indexOf('file://') != 0) {
+        internalServerError('URL (' + url + ') must start with file://');
         return;
     }
 
     if (request.headers['x-type'] == 'document') {
-        // I don't yet have a general solution to save new added CSS rules.
+        internalServerError("Can't add a new CSS rule. It's not yet supported.");
         return;
     }
 
@@ -28,8 +39,7 @@ http.createServer(function(request, response) {
         }
         stream.on('error', function(error) {
             console.error(error.message);
-            response.writeHead(500);
-            response.end(error.message);
+            internalServerError(error.message);
         });
         stream.on('close', function() {
             response.writeHead(200);
