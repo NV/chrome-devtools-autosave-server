@@ -8,6 +8,11 @@ http.createServer(function(request, response) {
         response.end(message);
     }
 
+    if (request.headers['x-type'] == 'document') {
+        internalServerError("Can't add a new CSS rule. It's not yet supported.");
+        return;
+    }
+
     var url = request.headers['x-url'];
 
     if (!url) {
@@ -17,11 +22,6 @@ http.createServer(function(request, response) {
 
     if (url.indexOf('file://') != 0) {
         internalServerError('URL (' + url + ') must start with file://');
-        return;
-    }
-
-    if (request.headers['x-type'] == 'document') {
-        internalServerError("Can't add a new CSS rule. It's not yet supported.");
         return;
     }
 
