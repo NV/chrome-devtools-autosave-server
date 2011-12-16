@@ -1,5 +1,12 @@
 'use strict';
 
+var routes = [
+    {
+        from: /^file:\/\/(?:localhost)?\//,
+        to: '/'
+    }
+];
+
 var http = require('http');
 var fs = require('fs');
 
@@ -11,7 +18,7 @@ http.createServer(function(request, response) {
     }
 
     if (request.headers['x-type'] == 'document') {
-        internalServerError("Can't add a new CSS rule. It's not yet supported.");
+        internalServerError("Can’t add a new CSS rule. It is not yet supported.");
         return;
     }
 
@@ -22,12 +29,27 @@ http.createServer(function(request, response) {
         return;
     }
 
-    if (url.indexOf('file://') != 0) {
-        internalServerError('URL (' + url + ') must start with file://');
+    var matches;
+    for (var i = 0; i < routes.length; i++) {
+        var route = routes[i];
+        if (route.from.test(url)) {
+            matches = true;
+            break;
+        }
+    }
+
+    if (!matches) {
+        if (i === 1) {
+            internalServerError('URL (' + url + ') doesn’t match RegExp ' + route.from);
+        } else {
+            internalServerError('URL (' + url + ') doesn’t match any of the following RegExps:\n' + routes.map(function(a) {
+                return a.from;
+            }).join('\n'));
+        }
         return;
     }
 
-    var path = decodeURIComponent(url.replace(/^file:\/\/(?:localhost)?/, ''));
+    var path = decodeURIComponent(url.replace(route.from, route.to));
 
     var chunks = [];
     request.on('data', function(chunk) {
