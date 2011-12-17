@@ -50,6 +50,10 @@ http.createServer(function(request, response) {
     }
 
     var path = decodeURIComponent(url.replace(route.from, route.to));
+    if (/\/[C-Z]:\//.test(path)) {
+        // Oh, Windows.
+        path = path.slice(1);
+    }
 
     var chunks = [];
     request.on('data', function(chunk) {
