@@ -11,7 +11,7 @@ program
 
 var routes;
 if (program.config) {
-    routes = require(require('path').join(process.cwd(), program.config));
+    routes = require(require('path').resolve(process.cwd(), program.config)).routes;
 } else {
     routes = autosave.routes;
 }
