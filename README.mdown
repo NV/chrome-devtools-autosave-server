@@ -1,1 +1,10 @@
-See [chrome-devtools-autosave](https://github.com/NV/chrome-devtools-autosave).
+A server for **[chrome-devtools-autosave](https://github.com/NV/chrome-devtools-autosave)**.
+
+## Installation
+
+1. Install [Node.js](http://nodejs.org/)
+2. Run `npm install -g autosave` in a terminal
+
+## Usage
+    $ autosave
+    DevTools Autosave is listening on http://127.0.0.1:9104

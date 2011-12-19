@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+
+var autosave = require('../index.js');
+var program = require('commander');
+
+program
+    .version('0.1.0')
+    .option('-p, --port [' + autosave.defaultPort + ']', 'set port to listen on', parseInt)
+    .option('-f, --config <routes.js>', 'set config file', String)
+    .parse(process.argv);
+
+var routes;
+if (program.config) {
+    routes = require(require('path').join(process.cwd(), program.config));
+} else {
+    routes = autosave.routes;
+}
+
+autosave.start(routes, program.port || autosave.defaultPort, autosave.defaultAddress);
