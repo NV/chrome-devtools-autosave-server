@@ -2,12 +2,13 @@
 
 var routes = [
     {
-        from: /^file:\/\/(?:localhost)?\//,
-        to: '/'
+        from: /^file:[/][/][^/]*[/]([^?]+)(\?.*)?$/,
+        to: '/$1'
     }
 ];
 var port = 9104;
 var address = '127.0.0.1';
+var version = '0.2.0';
 
 function start(routes, port, address) {
 
@@ -82,7 +83,7 @@ function start(routes, port, address) {
 
     }).listen(port, address);
 
-    console.log('DevTools Autosave is listening on http://' + address + ':' + port);
+    console.log('DevTools Autosave ' + version + ' is listening on http://' + address + ':' + port);
 }
 
 if (module.parent) {
@@ -91,6 +92,7 @@ if (module.parent) {
     exports.routes = routes;
     exports.defaultPort = port;
     exports.defaultAddress = address;
+    exports.version = version;
 } else {
     // Loaded directly, i.e. `node index.js`
     start(routes, port, address);
