@@ -2,13 +2,13 @@
 
 var routes = [
     {
-        from: /^file:[/][/][^/]*[/]([^?]+)(\?.*)?$/,
-        to: '/$1'
+        from: /^file:\/\/[^/]*\//,
+        to: '/'
     }
 ];
 var port = 9104;
 var address = '127.0.0.1';
-var version = '0.2.0';
+var version = '0.2.1';
 
 function start(routes, port, address) {
 
@@ -48,11 +48,19 @@ function start(routes, port, address) {
             return;
         }
 
-        var path = decodeURIComponent(url.replace(route.from, route.to));
+        var path = url.replace(route.from, route.to);
+
         if (/\/[C-Z]:\//.test(path)) {
             // Oh, Windows.
             path = path.slice(1);
         }
+
+        var queryIndex = path.indexOf('?');
+        if (queryIndex !== -1) {
+            path = path.slice(0, queryIndex);
+        }
+
+        path = decodeURIComponent(path);
 
         var chunks = [];
         request.on('data', function(chunk) {
