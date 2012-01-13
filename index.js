@@ -79,11 +79,9 @@ function start(routes, port, address) {
             stream.on('close', function() {
                 response.writeHead(200);
                 response.end('OK\n');
-
-                var dateObj = new Date(),
-                    date, time;
-                date = ('0' + dateObj.getDate()).slice(-2) + '-' + ('0' + (dateObj.getMonth()+1)).slice(-2) + '-' + dateObj.getFullYear();
-                console.log(date + ' ' + dateObj.toLocaleTimeString() + ': Saved a ' + request.headers['x-type'] + ' to ' + path);
+                var date = new Date();
+                var dateString = ('0' + date.getDate()).slice(-2) + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear();
+                console.log(dateString + ' ' + date.toLocaleTimeString() + ': Saved a ' + request.headers['x-type'] + ' to ' + path);
             });
             stream.end();
         });
