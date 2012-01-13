@@ -8,7 +8,7 @@ var routes = [
 ];
 var port = 9104;
 var address = '127.0.0.1';
-var version = '0.2.2';
+var version = '0.2.3';
 
 function start(routes, port, address) {
 
@@ -79,7 +79,11 @@ function start(routes, port, address) {
             stream.on('close', function() {
                 response.writeHead(200);
                 response.end('OK\n');
-                console.log('Saved a ' + request.headers['x-type'] + ' to ' + path);
+
+                var dateObj = new Date(),
+                    date, time;
+                date = ('0' + dateObj.getDate()).slice(-2) + '-' + ('0' + (dateObj.getMonth()+1)).slice(-2) + '-' + dateObj.getFullYear();
+                console.log(date + ' ' + dateObj.toLocaleTimeString() + ': Saved a ' + request.headers['x-type'] + ' to ' + path);
             });
             stream.end();
         });
