@@ -16,11 +16,6 @@ function start(routes, port, address) {
 
     require('http').createServer(function(request, response) {
 
-        if (request.headers['x-type'] == 'document') {
-            internalServerError("Can’t add a new CSS rule. It is not yet supported.");
-            return;
-        }
-
         var url = request.headers['x-url'];
 
         if (!url) {
