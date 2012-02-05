@@ -10,5 +10,6 @@ A server for **[chrome-devtools-autosave](https://github.com/NV/chrome-devtools-
 `sudo npm install -g autosave`
 
 ## Usage
-    $ autosave
-    DevTools Autosave is listening on http://127.0.0.1:9104
+
+Run `autosave` in the terminal.
+You should see something like "DevTools Autosave is listening on http://127.0.0.1:9104".
