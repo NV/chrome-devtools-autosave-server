@@ -86,9 +86,13 @@ function start(routes, port, address) {
             response.end(message);
         }
 
-    }).listen(port, address);
-
-    console.log('DevTools Autosave ' + version + ' is listening on http://' + address + ':' + port);
+    }).on('error', function(err) {
+        if (err.code === 'EADDRINUSE') {
+            console.log('http://' + address + ':' + port + ' is already in use. Exiting.');
+        }
+    }).listen(port, address, function() {
+        console.log('DevTools Autosave ' + version + ' is listening on http://' + address + ':' + port);
+    });
 }
 
 if (module.parent) {
