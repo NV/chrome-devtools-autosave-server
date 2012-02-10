@@ -16,6 +16,12 @@ function start(routes, port, address) {
 
     require('http').createServer(function(request, response) {
 
+        if (request.url !== '/save') {
+            response.writeHead(200);
+            response.end('DevTools Autosave ' + version + ' is running well.');
+            return;
+        };
+
         var url = request.headers['x-url'];
 
         if (!url) {
@@ -91,7 +97,7 @@ function start(routes, port, address) {
             console.log('http://' + address + ':' + port + ' is already in use. Exiting.');
         }
     }).listen(port, address, function() {
-        console.log('DevTools Autosave ' + version + ' is listening on http://' + address + ':' + port);
+        console.log('DevTools Autosave ' + version + ' is running on http://' + address + ':' + port);
     });
 }
 
