@@ -11,7 +11,12 @@ program
 
 var routes;
 if (program.config) {
-    routes = require(require('path').resolve(process.cwd(), program.config)).routes;
+    var path = require('path').resolve(process.cwd(), program.config);
+    routes = require(path).routes;
+    if (!routes || !routes.length) {
+        console.error('Error: ' + path + ' does not define any rules in exports.routes.');
+        process.exit(1);
+    }
 } else {
     routes = autosave.routes;
 }
