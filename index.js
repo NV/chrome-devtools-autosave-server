@@ -8,7 +8,7 @@ var routes = [
 ];
 var port = 9104;
 var address = '127.0.0.1';
-var version = '0.3.0';
+var version = '0.3.1';
 
 function start(routes, port, address) {
 
