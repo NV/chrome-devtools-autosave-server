@@ -3,7 +3,8 @@ A server for **[chrome-devtools-autosave](https://github.com/NV/chrome-devtools-
 ## Installation
 
 1. Install [Node.js](http://nodejs.org/)
-2. Run `npm install -g autosave` in a terminal
+2. Open a terminal (Terminal.app on Mac OS X, cmd.exe on Windows)
+3. Type `npm install -g autosave` and press Enter
 
 > It fails with "Error: EACCES, permission denied". What should I do?
 
