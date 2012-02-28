@@ -8,7 +8,7 @@ var routes = [
 ];
 var port = 9104;
 var address = '127.0.0.1';
-var version = '0.3.1';
+var version = '0.3.2';
 
 function start(routes, port, address) {
 
@@ -40,9 +40,9 @@ function start(routes, port, address) {
 
         if (!matches) {
             if (i === 1) {
-                internalServerError('URL (' + url + ') doesn’t match RegExp ' + route.from);
+                internalServerError(url + ' doesn’t match a route ' + route.from);
             } else {
-                internalServerError('URL (' + url + ') doesn’t match any of the following RegExps:\n' + routes.map(function(a) {
+                internalServerError(url + ' doesn’t match any of the following routes:\n' + routes.map(function(a) {
                     return a.from;
                 }).join('\n'));
             }
