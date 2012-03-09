@@ -15,6 +15,10 @@ A server for **[chrome-devtools-autosave](https://github.com/NV/chrome-devtools-
 Run `autosave` in the terminal.
 You should see something like "DevTools Autosave is running on http://127.0.0.1:9104".
 
+> It doesn’t work on Windows. I’m having `'autosave' is not recognized as an internal or external command`
+
+Have you tried turn it it off and on again? Seriously, restart the system.
+
 ## Configuration
 
 By default, Autosave only accepts URLs that starts with `file://`. For the other URLs it shows:
