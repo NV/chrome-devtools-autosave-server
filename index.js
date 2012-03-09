@@ -30,17 +30,16 @@ function start(routes, port, address) {
         }
 
         var matches;
-        for (var i = 0; i < routes.length; i++) {
-            var route = routes[i];
+        routes.forEach(function(route) {
             if (route.from.test(url)) {
+                save(route);
                 matches = true;
-                break;
             }
-        }
+        });
 
         if (!matches) {
             if (i === 1) {
-                internalServerError(url + ' doesn’t match a route ' + route.from);
+                internalServerError(url + ' doesn’t match a route ' + routes[0].from);
             } else {
                 internalServerError(url + ' doesn’t match any of the following routes:\n' + routes.map(function(a) {
                     return a.from;
@@ -49,47 +48,49 @@ function start(routes, port, address) {
             return;
         }
 
-        var path = url.replace(route.from, route.to);
-
-        if (/\/[C-Z]:\//.test(path)) {
-            // Oh, Windows.
-            path = path.slice(1);
-        }
-
-        var queryIndex = path.indexOf('?');
-        if (queryIndex !== -1) {
-            path = path.slice(0, queryIndex);
-        }
-
-        path = decodeURIComponent(path);
-
-        var chunks = [];
-        request.on('data', function(chunk) {
-            chunks.push(chunk);
-        });
-
-        request.on('end', function() {
-            var stream = fs.createWriteStream(path);
-            for (var i = 0; i < chunks.length; i++) {
-                stream.write(chunks[i]);
-            }
-            stream.on('error', function(error) {
-                console.error(error.message);
-                internalServerError(error.message);
-            });
-            stream.on('close', function() {
-                response.writeHead(200);
-                response.end('OK\n');
-                var date = new Date();
-                var dateString = ('0' + date.getDate()).slice(-2) + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear();
-                console.log(dateString + ' ' + date.toLocaleTimeString() + ': Saved a ' + request.headers['x-type'] + ' to ' + path);
-            });
-            stream.end();
-        });
-
         function internalServerError(message) {
             response.writeHead(500);
             response.end(message);
+        }
+        
+        function save(route) {
+            var path = url.replace(route.from, route.to);
+
+            if (/\/[C-Z]:\//.test(path)) {
+                // Oh, Windows.
+                path = path.slice(1);
+            }
+
+            var queryIndex = path.indexOf('?');
+            if (queryIndex !== -1) {
+                path = path.slice(0, queryIndex);
+            }
+
+            path = decodeURIComponent(path);
+
+            var chunks = [];
+            request.on('data', function(chunk) {
+                chunks.push(chunk);
+            });
+
+            request.on('end', function() {
+                var stream = fs.createWriteStream(path);
+                for (var i = 0; i < chunks.length; i++) {
+                    stream.write(chunks[i]);
+                }
+                stream.on('error', function(error) {
+                    console.error(error.message);
+                    internalServerError(error.message);
+                });
+                stream.on('close', function() {
+                    response.writeHead(200);
+                    response.end('OK\n');
+                    var date = new Date();
+                    var dateString = ('0' + date.getDate()).slice(-2) + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear();
+                    console.log(dateString + ' ' + date.toLocaleTimeString() + ': Saved a ' + request.headers['x-type'] + ' to ' + path);
+                });
+                stream.end();
+            });
         }
 
     }).on('error', function(err) {
