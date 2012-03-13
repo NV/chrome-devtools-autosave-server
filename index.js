@@ -8,24 +8,58 @@ var routes = [
 ];
 var port = 9104;
 var address = '127.0.0.1';
-var version = '0.3.2';
+var version = versionTriple('1.0.0');
+
+function versionTriple(version) {
+    var triple;
+    if (version) {
+        triple = version.split('.').map(function(x) {
+            return parseInt(x);
+        });
+    } else {
+        triple = [0, 0, 0];
+    }
+    triple.toString = function() {
+        return this.join('.');
+    };
+    return triple;
+}
 
 function start(routes, port, address) {
 
     var fs = require('fs');
+    var diff_match_patch = require('./diff_match_patch').diff_match_patch;
+    var diffMatchPatch = new diff_match_patch;
+
+    function patchesToText(patches) {
+        var text = [];
+        for (var i = 0; i < patches.length; i++) {
+            text[i] = diff_match_patch.patch_obj.prototype.toString.call(patches[i]);
+        }
+        return text.join('');
+    }
 
     require('http').createServer(function(request, response) {
 
-        if (request.url !== '/save') {
-            response.writeHead(200);
-            response.end('DevTools Autosave ' + version + ' is running well.');
-            return;
-        };
-
         var url = request.headers['x-url'];
-
         if (!url) {
-            internalServerError('X-URL header is missing');
+            response.writeHead(200);
+            response.end('DevTools Autosave ' + version);
+            return;
+        }
+
+        var protocolVersion = versionTriple(request.headers['x-autosave-version']);
+        if (version[0] != protocolVersion[0]) {
+            var message = 'Cannot save. ';
+            if (version[0] < protocolVersion[0]) {
+                message += 'Autosave Server is out of date. Update it by running `sudo npm install -g autosave@' + protocolVersion + '`.';
+                response.writeHead(500);
+            } else {
+                message += 'DevTools Autosave is out of date.' + protocolVersion;
+                response.writeHead(400);
+            }
+            console.error(message);
+            response.end(message);
             return;
         }
 
@@ -64,27 +98,25 @@ function start(routes, port, address) {
         path = decodeURIComponent(path);
 
         var chunks = [];
+        request.setEncoding('utf8');
         request.on('data', function(chunk) {
             chunks.push(chunk);
         });
 
         request.on('end', function() {
-            var stream = fs.createWriteStream(path);
-            for (var i = 0; i < chunks.length; i++) {
-                stream.write(chunks[i]);
+            var file = fs.readFileSync(path, 'utf8');
+            try {
+                var patches = JSON.parse(chunks.join(''));
+            } catch (err) {
+                console.error('Cannot parse a patch. Invalid JSON: ', err);
+                return;
             }
-            stream.on('error', function(error) {
-                console.error(error.message);
-                internalServerError(error.message);
-            });
-            stream.on('close', function() {
-                response.writeHead(200);
-                response.end('OK\n');
-                var date = new Date();
-                var dateString = ('0' + date.getDate()).slice(-2) + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear();
-                console.log(dateString + ' ' + date.toLocaleTimeString() + ': Saved a ' + request.headers['x-type'] + ' to ' + path);
-            });
-            stream.end();
+            var newFile = diffMatchPatch.patch_apply(patches, file);
+            fs.writeFileSync(path, newFile[0]);
+
+            response.writeHead(200);
+            response.end('OK\n');
+            console.log('Saved a ' + request.headers['x-type'] + ' to ' + path + '\n' + patchesToText(patches));
         });
 
         function internalServerError(message) {
