@@ -31,14 +31,6 @@ function start(routes, port, address) {
     var diff_match_patch = require('./diff_match_patch').diff_match_patch;
     var diffMatchPatch = new diff_match_patch;
 
-    function patchesToText(patches) {
-        var text = [];
-        for (var i = 0; i < patches.length; i++) {
-            text[i] = diff_match_patch.patch_obj.prototype.toString.call(patches[i]);
-        }
-        return text.join('');
-    }
-
     require('http').createServer(function(request, response) {
 
         var url = request.headers['x-url'];
@@ -58,7 +50,7 @@ function start(routes, port, address) {
                 message += 'DevTools Autosave is out of date.' + protocolVersion;
                 response.writeHead(400);
             }
-            console.error(message);
+            error(message);
             response.end(message);
             return;
         }
@@ -113,34 +105,73 @@ function start(routes, port, address) {
             try {
                 var patches = JSON.parse(chunks.join(''));
             } catch (error) {
-                console.error('Cannot parse a patch. Invalid JSON: ', error);
+                error('Cannot parse a patch. Invalid JSON: ', error);
                 return;
             }
-            var newFile = diffMatchPatch.patch_apply(patches, content);
+            var patchResult = diffMatchPatch.patch_apply(patches, content);
             try {
-                fs.writeFileSync(path, newFile[0]);
+                fs.writeFileSync(path, patchResult[0]);
             } catch (err) {
                 internalServerError('Cannot write to file. ' + err);
                 return;
             }
             response.writeHead(200);
             response.end('OK\n');
-            console.log('Saved a ' + request.headers['x-type'] + ' to ' + path + '\n' + patchesToText(patches));
+            info('Saved a ' + request.headers['x-type'] + ' to ' + path);
+            printPatches(patches, patchResult[1]);
         });
 
         function internalServerError(message) {
             response.writeHead(500);
             response.end(message);
-            console.error(message);
+            error(message);
         }
 
     }).on('error', function(err) {
         if (err.code === 'EADDRINUSE') {
-            console.log('http://' + address + ':' + port + ' is already in use. Exiting.');
+            error('http://' + address + ':' + port + ' is already in use. Exiting.');
         }
     }).listen(port, address, function() {
-        console.log('DevTools Autosave ' + version + ' is running on http://' + address + ':' + port);
+        info('DevTools Autosave ' + version + ' is running on http://' + address + ':' + port);
     });
+}
+
+/**
+ * @param {Array} patches
+ * @param {Array} results
+ */
+function printPatches(patches, results) {
+    for (var i = 0, ii = patches.length; i < ii; i++) {
+        var patch = patches[i];
+        log((results[i] ? '\x1B[37m' : '\x1B[30;41m') + patch.start1 + ':');
+        var diffs = patch.diffs;
+        for (var j = 0, jj = diffs.length; j < jj; j++) {
+            var diff = diffs[j];
+            if (diff[0] === 0) {
+                log('\x1B[0m' + diff[1]);
+            } else {
+                var text = diff[1];
+                if (text.trim() === '') {
+                    text = text.replace(/ /g, '·');
+                }
+                text = text.replace(/\n/g, '↵\n');
+                log((diff[0] === 1 ? '\x1B[32m' : '\x1B[31m') + text);
+            }
+        }
+        log('\n\x1B[0m');
+    }
+}
+
+function log(text) {
+    process.stdout.write(text);
+}
+
+function info(text) {
+    process.stdout.write('\x1B[36m' + text + '\x1B[0m\n');
+}
+
+function error(text) {
+    process.stdout.write('\x1B[31m' + text + '\x1B[0m\n');
 }
 
 if (module.parent) {
