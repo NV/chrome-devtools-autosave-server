@@ -104,16 +104,25 @@ function start(routes, port, address) {
         });
 
         request.on('end', function() {
-            var file = fs.readFileSync(path, 'utf8');
             try {
-                var patches = JSON.parse(chunks.join(''));
+                var content = fs.readFileSync(path, 'utf8');
             } catch (err) {
-                console.error('Cannot parse a patch. Invalid JSON: ', err);
+                internalServerError('Cannot read file. ' + err);
                 return;
             }
-            var newFile = diffMatchPatch.patch_apply(patches, file);
-            fs.writeFileSync(path, newFile[0]);
-
+            try {
+                var patches = JSON.parse(chunks.join(''));
+            } catch (error) {
+                console.error('Cannot parse a patch. Invalid JSON: ', error);
+                return;
+            }
+            var newFile = diffMatchPatch.patch_apply(patches, content);
+            try {
+                fs.writeFileSync(path, newFile[0]);
+            } catch (err) {
+                internalServerError('Cannot write to file. ' + err);
+                return;
+            }
             response.writeHead(200);
             response.end('OK\n');
             console.log('Saved a ' + request.headers['x-type'] + ' to ' + path + '\n' + patchesToText(patches));
@@ -122,6 +131,7 @@ function start(routes, port, address) {
         function internalServerError(message) {
             response.writeHead(500);
             response.end(message);
+            console.error(message);
         }
 
     }).on('error', function(err) {
