@@ -10,6 +10,11 @@ var port = 9104;
 var address = '127.0.0.1';
 var version = versionTriple('1.0.0');
 
+/**
+ * @param {string} version
+ * @nosideeffects
+ * @return {Array}
+ */
 function versionTriple(version) {
     var triple;
     if (version) {
@@ -25,11 +30,16 @@ function versionTriple(version) {
     return triple;
 }
 
+/**
+ * @param {Array} routes
+ * @param {string|number} port
+ * @param {string} address
+ */
 function start(routes, port, address) {
 
     var fs = require('fs');
     var diff_match_patch = require('./diff_match_patch').diff_match_patch;
-    var diffMatchPatch = new diff_match_patch;
+    var diffMatchPatch = new diff_match_patch();
 
     require('http').createServer(function(request, response) {
 
@@ -41,7 +51,7 @@ function start(routes, port, address) {
         }
 
         var protocolVersion = versionTriple(request.headers['x-autosave-version']);
-        if (version[0] != protocolVersion[0]) {
+        if (version[0] !== protocolVersion[0]) {
             var message = 'Cannot save. ';
             if (version[0] < protocolVersion[0]) {
                 message += 'Autosave Server is out of date. Update it by running `sudo npm install -g autosave@' + protocolVersion + '`.';
