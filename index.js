@@ -65,12 +65,13 @@ function start(routes, port, address) {
             return;
         }
 
+        var path = url;
         var matches;
         for (var i = 0; i < routes.length; i++) {
             var route = routes[i];
-            if (route.from.test(url)) {
+            if (route.from.test(path)) {
                 matches = true;
-                break;
+                path = path.replace(route.from, route.to);
             }
         }
 
@@ -84,8 +85,6 @@ function start(routes, port, address) {
             }
             return;
         }
-
-        var path = url.replace(route.from, route.to);
 
         if (/\/[C-Z]:\//.test(path)) {
             // Oh, Windows.
