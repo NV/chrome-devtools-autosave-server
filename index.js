@@ -1,11 +1,5 @@
 'use strict';
 
-var routes = [
-    {
-        from: /^file:\/\/[^/]*\//,
-        to: '/'
-    }
-];
 var port = 9104;
 var address = '127.0.0.1';
 var version = versionTriple('1.0.0');
@@ -57,7 +51,7 @@ function start(routes, port, address) {
                 message += 'Autosave Server is out of date. Update it by running `sudo npm install -g autosave@' + protocolVersion + '`.';
                 response.writeHead(500);
             } else {
-                message += 'DevTools Autosave is out of date.' + protocolVersion;
+                message += 'Chrome DevTools Autosave ' + protocolVersion[0] + '.x doesn’t work with Autosave Server ' + version[0] + '.x.';
                 response.writeHead(400);
             }
             error(message);
@@ -65,39 +59,44 @@ function start(routes, port, address) {
             return;
         }
 
-        var matches;
-        for (var i = 0; i < routes.length; i++) {
-            var route = routes[i];
-            if (route.from.test(url)) {
-                matches = true;
-                break;
+        var path = '';
+        if (routes) {
+            var matches;
+            for (var i = 0; i < routes.length; i++) {
+                var route = routes[i];
+                if (route.from.test(url)) {
+                    matches = true;
+                    break;
+                }
             }
-        }
 
-        if (!matches) {
-            if (i === 1) {
-                internalServerError(url + ' doesn’t match a route ' + route.from);
-            } else {
-                internalServerError(url + ' doesn’t match any of the following routes:\n' + routes.map(function(a) {
-                    return a.from;
-                }).join('\n'));
+            if (!matches) {
+                if (i === 1) {
+                    internalServerError(url + ' doesn’t match a route ' + route.from);
+                } else {
+                    internalServerError(url + ' doesn’t match any of the following routes:\n' + routes.map(function(a) {
+                        return a.from;
+                    }).join('\n'));
+                }
+                return;
             }
-            return;
+
+            path = url.replace(route.from, route.to);
+
+            var queryIndex = path.indexOf('?');
+            if (queryIndex !== -1) {
+                path = path.slice(0, queryIndex);
+            }
+
+            path = decodeURIComponent(path);
+
+            if (/^\/[C-Z]:\//.test(path)) {
+                // Oh, Windows.
+                path = path.slice(1);
+            }
+        } else {
+            path = request.headers['x-path'];
         }
-
-        var path = url.replace(route.from, route.to);
-
-        if (/\/[C-Z]:\//.test(path)) {
-            // Oh, Windows.
-            path = path.slice(1);
-        }
-
-        var queryIndex = path.indexOf('?');
-        if (queryIndex !== -1) {
-            path = path.slice(0, queryIndex);
-        }
-
-        path = decodeURIComponent(path);
 
         var chunks = [];
         request.setEncoding('utf8');
@@ -187,11 +186,10 @@ function error(text) {
 if (module.parent) {
     // Loaded via module, i.e. require('index.js')
     exports.start = start;
-    exports.routes = routes;
     exports.defaultPort = port;
     exports.defaultAddress = address;
     exports.version = version;
 } else {
     // Loaded directly, i.e. `node index.js`
-    start(routes, port, address);
+    start(null, port, address);
 }

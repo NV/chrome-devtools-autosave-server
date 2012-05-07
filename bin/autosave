@@ -10,7 +10,7 @@ program
     .option('-f, --config <routes.js>', 'set config file', String)
     .parse(process.argv);
 
-var routes;
+var routes = null;
 if (program.config) {
     var path = require('path').resolve(process.cwd(), program.config);
     routes = require(path).routes;
@@ -18,8 +18,6 @@ if (program.config) {
         console.error('Error: ' + path + ' does not define any rules in exports.routes.');
         process.exit(1);
     }
-} else {
-    routes = autosave.routes;
 }
 
 autosave.start(routes, program.port || autosave.defaultPort, program.address || autosave.defaultAddress);
