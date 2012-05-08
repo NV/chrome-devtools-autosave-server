@@ -4,7 +4,7 @@ var autosave = require('../index.js');
 var program = require('commander');
 
 program
-    .version(autosave.version)
+    .version(autosave.version.toString())
     .option('-p, --port [' + autosave.defaultPort + ']', 'set port to listen on', parseInt)
     .option('-a, --address [' + autosave.defaultAddress + ']', 'set address to listen on', String)
     .option('-f, --config <routes.js>', 'set config file', String)
