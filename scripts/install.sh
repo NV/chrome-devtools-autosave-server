@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [[ $OSTYPE == darwin* ]]; then
-    launch_agents_dir=$HOME/library/launchagents/
+    launch_agents_dir=$HOME/Library/LaunchAgents/
     name='com.chrome.devtools.autosave.launchd'
     filename=$name.plist
     cp -v `dirname $0`/$filename $launch_agents_dir
