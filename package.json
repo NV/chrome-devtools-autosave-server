@@ -6,6 +6,9 @@
     "bin": {
         "autosave": "./bin/autosave"
     },
+    "scripts": {
+        "install": "./scripts/install.sh"
+    },
     "preferGlobal" : true,
     "author": "Nikita Vasilyev <me@elv1s.ru>",
     "main": "index",
