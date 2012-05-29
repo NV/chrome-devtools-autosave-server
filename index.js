@@ -108,7 +108,7 @@ function start(routes, port, address) {
             try {
                 var content = fs.readFileSync(path, 'utf8');
             } catch (err) {
-                internalServerError('Cannot read file. ' + err);
+                internalServerError('Cannot read a file. ' + err);
                 return;
             }
             try {
@@ -121,7 +121,7 @@ function start(routes, port, address) {
             try {
                 fs.writeFileSync(path, patchResult[0]);
             } catch (err) {
-                internalServerError('Cannot write to file. ' + err);
+                internalServerError('Cannot write to a file. ' + err);
                 return;
             }
             response.writeHead(200);
