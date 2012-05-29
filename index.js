@@ -51,7 +51,7 @@ function start(routes, port, address) {
                 message += 'Autosave Server is out of date. Update it by running `sudo npm install -g autosave@' + protocolVersion + '`.';
                 response.writeHead(500);
             } else {
-                message += 'Chrome DevTools Autosave ' + protocolVersion[0] + '.x doesn’t work with Autosave Server ' + version[0] + '.x.';
+                message += 'Chrome DevTools Autosave ' + protocolVersion[0] + '.x doesn\'t work with Autosave Server ' + version[0] + '.x.';
                 response.writeHead(400);
             }
             error(message);
