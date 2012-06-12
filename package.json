@@ -1,6 +1,6 @@
 {
     "name": "autosave",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "A server for Chrome Devtools Autosave (https://github.com/NV/chrome-devtools-autosave)",
     "keywords": ["devtools"],
     "bin": {
@@ -8,7 +8,7 @@
     },
     "scripts": {
         "autostart": "./scripts/autostart.sh",
-        "install": "./scripts/install.sh"
+        "install": "node ./scripts/install.js"
     },
     "preferGlobal" : true,
     "author": "Nikita Vasilyev <me@elv1s.ru>",
