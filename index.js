@@ -6,7 +6,6 @@ var version = versionTriple('1.0.0');
 
 /**
  * @param {string} version
- * @nosideeffects
  * @return {Array}
  */
 function versionTriple(version) {
