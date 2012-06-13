@@ -21,7 +21,7 @@ Have you tried turn it it off and on again? Seriously, restart the system.
 
 ## Run on OS launch
 
-It might be annoying to open a terminal and type "autosave↵" every time you need to run Autosave. On Mac OS X and Ubuntu you can run Autosave on OS launch as a [daemon](http://en.wikipedia.org/wiki/Daemon_(computing)). To do so run:
+It might be annoying to open a terminal and type "autosave↵" every time you need to run Autosave. On Mac OS X and Ubuntu you can run Autosave on OS launch as a <a href="http://en.wikipedia.org/wiki/Daemon_(computing)">daemon</a>. To do so run:
 
     npm run-script -g autosave autostart
 
