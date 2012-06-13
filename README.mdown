@@ -8,7 +8,7 @@ A server for **[chrome-devtools-autosave](https://github.com/NV/chrome-devtools-
 
 > It fails with "Error: EACCES, permission denied". What should I do?
 
-`sudo npm install -g autosave`
+Run the same command as an administrator. On Mac OS X and Linux it would be `sudo npm install -g autosave`.
 
 ## Usage
 
@@ -19,26 +19,10 @@ You should see something like "DevTools Autosave is running on http://127.0.0.1:
 
 Have you tried turn it it off and on again? Seriously, restart the system.
 
-## Configuration
+## Run on OS launch
 
-By default, Autosave only accepts URLs that starts with `file://`. For the other URLs it shows:
+It might be annoying to open a terminal and type "autosave↵" every time you need to run Autosave. On Mac OS X and Ubuntu you can run Autosave on OS launch as a [daemon](http://en.wikipedia.org/wiki/Daemon_(computing)). To do so run:
 
-![Chrome notification: error message](http://userscripts.ru/js/chrome-devtools-autosave/URL_doesnt_match_a_route.png)
+    npm run-script -g autosave autostart
 
-Let’s say you want to edit `http://mydomain.local/main.css`; the actual file is located in /Volumes/mydomain.local/main.css.
-To do so, you need to run `autosave --config routes.js`; routes.js file looks like this:
-
-```javascript
-exports.routes = [
-    {
-        from: new RegExp('^http://mydomain\.local/'),
-        to: '/Volumes/mydomain.local/'
-    }
-];
-```
-
-Step by step:
-
-1. Create a routes.js with the above content
-2. Save it in ~/.autosave/routes.js (or any other location, it doesn’t matter)
-3. Run `autosave --config ~/.autosave/routes.js`
+It is [not yet available](https://github.com/NV/chrome-devtools-autosave-server/issues/9) on other operation systems.
