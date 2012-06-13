@@ -1,6 +1,6 @@
 {
     "name": "autosave",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "A server for Chrome Devtools Autosave (https://github.com/NV/chrome-devtools-autosave)",
     "keywords": ["devtools"],
     "bin": {
