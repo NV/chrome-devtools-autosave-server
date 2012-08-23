@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/NV/chrome-devtools-autosave-server.png)](http://travis-ci.org/NV/chrome-devtools-autosave-server)
 A server for **[chrome-devtools-autosave](https://github.com/NV/chrome-devtools-autosave)**.
 
 ## Installation
